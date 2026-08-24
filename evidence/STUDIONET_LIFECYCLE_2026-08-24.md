@@ -3,6 +3,7 @@
 Date: 2026-08-24  
 Contract: `0xc9d2EbEcAc66eCe11f5BF7F7e97A1E0925982312`  
 Explorer: https://explorer-studio.genlayer.com/address/0xc9d2EbEcAc66eCe11f5BF7F7e97A1E0925982312
+Live app: https://reserve-covenant.vercel.app
 
 This record covers real GEN custody, semantic consensus, deterministic settlement, capability consumption, contract-level failures and bounded recovery. Explorer is the canonical transaction source.
 
