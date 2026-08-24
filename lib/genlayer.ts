@@ -16,6 +16,26 @@ type RuntimeClient = {
   getTransaction:(args:{hash:`0x${string}`})=>Promise<Record<string,unknown>>;
 };
 export type Result={success:boolean;data?:unknown;hash?:string;status?:string;error?:string};
+type RuntimeFailure={kind:string;payload:string};
+function findRuntimeFailure(value:unknown,seen=new Set<unknown>()):RuntimeFailure|null{
+  if(!value||typeof value!=="object"||seen.has(value))return null;
+  seen.add(value);
+  const record=value as Record<string,unknown>;
+  const status=String(record.status??record.execution_result??record.txExecutionResultName??"").toUpperCase();
+  const failed=["ROLLBACK","CONTRACT_ERROR","ERROR","FAILED","FINISHED_WITH_ERROR"].some(marker=>status.includes(marker));
+  if(failed){
+    const raw=record.payload??record.error_description??record.raw_error??record.message??status;
+    const payload=typeof raw==="string"?raw:JSON.stringify(raw);
+    return{kind:status||"CONTRACT_ERROR",payload};
+  }
+  for(const nested of Object.values(record)){
+    if(nested&&typeof nested==="object"){
+      const failure=findRuntimeFailure(nested,seen);
+      if(failure)return failure;
+    }
+  }
+  return null;
+}
 export const contractAddress=()=>process.env.NEXT_PUBLIC_CONTRACT_ADDRESS||"";
 export const explorerUrl=()=>`${process.env.NEXT_PUBLIC_EXPLORER_BASE||"https://explorer-studio.genlayer.com/address/"}${contractAddress()}`;
 export async function connectWallet():Promise<Result>{
@@ -40,8 +60,8 @@ export async function writeContract(functionName:string,args:unknown[]=[],value=
     hash=typeof raw==="string"?raw:raw.txId;
     const receipt=await client.waitForTransactionReceipt({hash:hash as `0x${string}`,status:TransactionStatus.ACCEPTED,interval:2000,retries:100});
     let observed=receipt;try{observed=await client.getTransaction({hash:hash as `0x${string}`});}catch{}
-    const execution=String(observed.txExecutionResultName||receipt.txExecutionResultName||"");
-    if(["FINISHED_WITH_ERROR","FAILED"].includes(execution))return{success:false,hash,error:"Contract rejected this action. Inspect the transaction payload."};
+    const failure=findRuntimeFailure(observed)||findRuntimeFailure(receipt);
+    if(failure)return{success:false,hash,error:`Contract rejected this action: ${failure.payload}`};
     return{success:true,hash,status:String(observed.statusName||receipt.statusName||"ACCEPTED"),data:receipt};
   }catch(error){return{success:false,hash,error:error instanceof Error?error.message:"Contract write failed."};}
 }

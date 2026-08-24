@@ -40,3 +40,7 @@ Copy `.env.example` to `.env.local` after a contract is deployed. Until then the
 - `get_assessment`, `get_capability`, `get_totals` — frontend-readable state
 
 See [SPEC.md](SPEC.md) for state-machine, provenance and economic invariants.
+
+## Verified runtime evidence
+
+The complete Studionet lifecycle—including public IPFS evidence, semantic outcome, `0.02 GEN` payout, capability replay rejection, early-recovery rejection, bounded `0.005 GEN` refund and final conservation accounting—is recorded in [evidence/STUDIONET_LIFECYCLE_2026-08-24.md](evidence/STUDIONET_LIFECYCLE_2026-08-24.md).
