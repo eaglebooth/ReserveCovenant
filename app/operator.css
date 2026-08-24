@@ -1,0 +1,26 @@
+.operatorCard{margin-top:18px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(140deg,#130e29,#0b0819);padding:28px;display:grid;grid-template-columns:.7fr 1.3fr;gap:26px}
+.operatorIntro small{color:var(--violet);text-transform:uppercase;letter-spacing:.1em}
+.operatorIntro h3{font-size:27px;margin:12px 0}
+.operatorIntro p{color:var(--muted);line-height:1.55}
+.operatorFields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.operatorFields label{display:grid;gap:7px;color:var(--muted);font-size:12px}
+.operatorFields input{padding:12px;border:1px solid #332950;background:#080616;color:#fff;border-radius:10px;min-width:0}
+.actionRail{grid-column:1/-1;display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.actionRail button{padding:12px 9px;border:1px solid #493a76;background:#1b1437;color:#d8ceff;border-radius:10px;cursor:pointer}
+.actionRail button:hover{background:#2b1f58}
+.actionRail button:disabled{opacity:.5}
+@media(max-width:850px){.operatorCard{grid-template-columns:1fr}.operatorFields{grid-template-columns:1fr}.actionRail{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.actionRail{grid-template-columns:1fr}}
+
+/* Content must remain usable even when IntersectionObserver or hydration is unavailable. */
+.reveal{opacity:1!important;transform:none!important;animation:reserve-rise .65s ease both}
+@keyframes reserve-rise{from{opacity:.15;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.reveal{animation:none}}
+.terminalPage{min-height:100vh;padding-top:76px;background:radial-gradient(circle at 50% 0,#171033 0,var(--bg) 42%)}
+.terminalPage .terminal{padding-top:52px}
+.terminalPage .terminalHeading h1{font-size:clamp(42px,5vw,72px);letter-spacing:-.055em;margin:20px 0;background:linear-gradient(110deg,#e1d9ff,#8d72ff);-webkit-background-clip:text;color:transparent}
+.backLink{display:inline-flex;align-items:center;gap:7px;color:var(--muted);margin-bottom:32px}
+.backLink svg,.terminalPage .nav svg{width:16px}
+.terminalPage .nav a{display:flex;align-items:center;gap:7px}
+.workflowHeading{width:min(1152px,100%);margin:0 auto}
+.workflowHeading h2{max-width:850px;margin-left:0}
