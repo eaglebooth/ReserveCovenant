@@ -36,3 +36,33 @@ All finalized with `MAJORITY_AGREE` and rolled back with the expected error.
 - [Issuer fallback](https://github.com/eaglebooth/ReserveCovenant/blob/fb7514d1961defa92187304026b7a3fc2fb2d30d/samples/issuer-attestation.json)
 - [Challenger primary](https://raw.githubusercontent.com/eaglebooth/ReserveCovenant/fb7514d1961defa92187304026b7a3fc2fb2d30d/samples/challenger-observation.json)
 - [Challenger fallback](https://github.com/eaglebooth/ReserveCovenant/blob/fb7514d1961defa92187304026b7a3fc2fb2d30d/samples/challenger-observation.json)
+
+## Live authority-conflict path
+
+Assessment `1` compared the approved `CANONICAL` issuer attestation with an
+approved contradictory `INDEPENDENT` observation. The first assessment attempt
+ended `MAJORITY_DISAGREE` after three rotations and left the assessment
+`CHALLENGED`, demonstrating fail-closed consensus. A safe retry reached
+`MAJORITY_AGREE`; authoritative readback then showed
+`conflict_resolution: ISSUER`, the issuer facts, and `HEALTHY`.
+
+| Action | Result | Transaction |
+| --- | --- | --- |
+| Open conflict assessment | ID `1`; `0.01 GEN` locked | [`0x0ac0…976a`](https://explorer-studio.genlayer.com/transactions/0x0ac098892e3981005c2526f3d7a787c8ed39dca8c212f50d4acf8047f87c976a) |
+| Submit contradictory counter-evidence | `CHALLENGED`; matching `0.01 GEN` locked | [`0x6312…40a8`](https://explorer-studio.genlayer.com/transactions/0x6312e006653700951286d90aa61d70238f94e1cbb5ff9115de4ed6904f4140a8) |
+| First consensus attempt | `MAJORITY_DISAGREE`; no state transition | [`0x200b…a124`](https://explorer-studio.genlayer.com/transactions/0x200b25f9afc2a2a8dd94f5cf1fad9dfa0dc015be2d010481de41b2b0ab5ca124) |
+| Consensus retry | `MAJORITY_AGREE`; `ISSUER` precedence | [`0xaf13…7291`](https://explorer-studio.genlayer.com/transactions/0xaf1368b38ad1f2311400911122b32b45a2412b92f2d4e3d7e24372321bcf7291) |
+| Settle conflict | `HEALTHY`; `0.02 GEN` paid | [`0xe1f9…bb19`](https://explorer-studio.genlayer.com/transactions/0xe1f926dcca580bf3e1759b488aedc572cfe9124d2056aa28f47f892376b9bb19) |
+
+Final conflict assessment readback:
+
+```json
+{"asset":"DEMOUSD","challenger_authority":"INDEPENDENT","conflict_resolution":"ISSUER","epoch":14,"exception":"NO","freshness":"CURRENT","issuer_authority":"CANONICAL","issuer_paid":20000000000000000,"reserve":"SUFFICIENT","risk":"HEALTHY","scope":"MATCH","status":"SETTLED"}
+```
+
+Final contract accounting after both lifecycles: `2` assessments, `0.04 GEN`
+deposited, `0 GEN` held, `0.04 GEN` paid, and `0 GEN` refunded.
+
+Conflict fixture:
+
+- [Contradictory independent observation](https://raw.githubusercontent.com/eaglebooth/ReserveCovenant/ef3aace45d475526bbb62bc6e63ae040c368367e/samples/challenger-conflict.json)
