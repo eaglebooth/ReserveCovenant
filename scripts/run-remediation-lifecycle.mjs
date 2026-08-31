@@ -13,6 +13,10 @@ const ISSUER_PRIMARY = `https://raw.githubusercontent.com/eaglebooth/ReserveCove
 const ISSUER_FALLBACK = `https://github.com/eaglebooth/ReserveCovenant/blob/${COMMIT}/samples/${ISSUER_ID}`;
 const COUNTER_PRIMARY = `https://raw.githubusercontent.com/eaglebooth/ReserveCovenant/${COMMIT}/samples/${COUNTER_ID}`;
 const COUNTER_FALLBACK = `https://github.com/eaglebooth/ReserveCovenant/blob/${COMMIT}/samples/${COUNTER_ID}`;
+const ISSUER_DIGEST = "sha256:d9a8701cbbb2ede21bb694901cb8de99838dd10ffeea65f1a8f92b93b2ee9a2e";
+const ISSUER_BYTE_LENGTH = 200;
+const COUNTER_DIGEST = "sha256:f74a8eb5c2e4cbbcf58fb4e425b964c73874fa2b853e1e12ba6f841d4041296b";
+const COUNTER_BYTE_LENGTH = 164;
 const SKIP_APPROVALS = process.argv.includes("--skip-approvals");
 
 async function readSecretLines(count) {
@@ -110,8 +114,8 @@ const evidence = {
 
 if (!SKIP_APPROVALS) {
   evidence.happy_path.push(await submit(ownerClient, "approve_issuer", "approve_issuer", [owner.address, ASSET]));
-  evidence.happy_path.push(await submit(ownerClient, "approve_issuer_evidence", "approve_evidence", [ASSET, EPOCH, ISSUER_ID, "CANONICAL", ISSUER_PRIMARY, ISSUER_FALLBACK]));
-  evidence.happy_path.push(await submit(ownerClient, "approve_counter_evidence", "approve_evidence", [ASSET, EPOCH, COUNTER_ID, "INDEPENDENT", COUNTER_PRIMARY, COUNTER_FALLBACK]));
+  evidence.happy_path.push(await submit(ownerClient, "approve_issuer_evidence", "approve_evidence", [ASSET, EPOCH, ISSUER_ID, "CANONICAL", ISSUER_DIGEST, ISSUER_BYTE_LENGTH, ISSUER_PRIMARY, ISSUER_FALLBACK]));
+  evidence.happy_path.push(await submit(ownerClient, "approve_counter_evidence", "approve_evidence", [ASSET, EPOCH, COUNTER_ID, "INDEPENDENT", COUNTER_DIGEST, COUNTER_BYTE_LENGTH, COUNTER_PRIMARY, COUNTER_FALLBACK]));
 } else {
   evidence.approvals = "owner-submitted and verified by first dependent writes";
 }

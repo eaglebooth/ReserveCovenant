@@ -12,7 +12,7 @@ The deployment owner records two bindings before an assessment can hold funds:
 
 ```text
 issuer wallet + asset
-immutable evidence ID + exact primary/fallback URLs + asset + epoch + authority class
+immutable evidence ID + exact primary/fallback URLs + SHA-256 + byte length + asset + epoch + authority class
 ```
 
 Authority precedence is deterministic:
@@ -58,12 +58,24 @@ No LLM chooses an amount. Consensus only normalizes bounded facts; the contract 
 
 Evidence packets must use a registry-approved immutable identifier present in two
 independent HTTPS gateway URLs. Approval binds the ID and both exact URLs to an
-asset, epoch and authority class; issuer approval separately binds the opening
+asset, epoch, authority class, SHA-256 digest and exact byte length. During
+assessment, validators fetch bytes, recompute SHA-256 and reject digest or length
+mismatch before semantic review. Issuer approval separately binds the opening
 wallet to the asset. A caller cannot embed an approved ID inside a different
 attacker-controlled URL and inherit its authority.
 This creates an explicit on-chain trust root but does not prove that the registry
 owner has off-chain legal authority. Production governance must document how that
 owner verifies canonical issuers and reserve publications.
+
+This primitive authenticates individual reserve-document bytes. It does not
+claim repository-snapshot completeness or canonical Git-tree membership. Such a
+claim requires an authenticated tree or SBOM proof in addition to this document
+commitment.
+
+Digest mismatch, byte-length mismatch and source unavailability deterministically
+produce an `UNKNOWN/UNRESOLVED` fact set. The assessment enters bounded recovery
+instead of becoming settleable, so mutable or truncated evidence cannot direct a
+payout.
 
 ## Frontend transaction identity
 

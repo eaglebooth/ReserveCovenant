@@ -4,13 +4,17 @@ ReserveCovenant is a GenLayer dApp that turns public reserve attestations into G
 
 ## Studionet deployment
 
-- Remediation contract: `0x22C9977940A6dB689Ed6e10F613805376eD7030e`
+- Verified pre-digest contract: `0x22C9977940A6dB689Ed6e10F613805376eD7030e`
 - Explorer: https://explorer-studio.genlayer.com/address/0x22C9977940A6dB689Ed6e10F613805376eD7030e
 - Live app: https://reserve-covenant.vercel.app
 
-The remediation address has completed happy-path and failure-path Studionet
-verification. See [`STUDIONET_REMEDIATION_2026-08-31.md`](STUDIONET_REMEDIATION_2026-08-31.md)
-for transaction links, immutable sources, GEN accounting and rollback guards.
+That address has completed happy-path, failure-path and live authority-conflict
+verification for the authority-precedence revision. The current source adds
+fetched-byte SHA-256 and byte-length verification and therefore requires a new
+deployment before resubmission; the address above must not be presented as
+source-parity evidence for the new revision. See
+[`STUDIONET_REMEDIATION_2026-08-31.md`](STUDIONET_REMEDIATION_2026-08-31.md)
+for the historical runtime record.
 
 ## Why GenLayer
 
@@ -41,7 +45,7 @@ Copy `.env.example` to `.env.local` after a contract is deployed. Until then the
 ## Contract methods
 
 - `approve_issuer(...)` — registry owner binds one wallet to an asset
-- `approve_evidence(...)` — registry owner binds an immutable ID and exact gateway URLs to asset, epoch and authority class
+- `approve_evidence(...)` — registry owner binds an immutable ID, exact URLs, SHA-256 digest and byte length to asset, epoch and authority class
 - `open_assessment(...)` — payable issuer bond and immutable evidence lock
 - `challenge(...)` — payable matching bond and counter-evidence lock
 - `assess(id)` — multi-source semantic consensus
@@ -58,12 +62,24 @@ See [SPEC.md](SPEC.md) for state-machine, provenance and economic invariants.
 - Issuer and challenger evidence IDs must be approved for the exact asset and
   epoch as `CANONICAL`, `REGULATED`, or `INDEPENDENT`; runtime URLs must exactly
   match the approved primary and fallback sources.
+- Validators fetch the response bytes, recompute SHA-256, verify exact byte
+  length, and fail closed on mismatch or unavailability before semantic review.
 - Conflicting attestations do not automatically enter refund recovery. Validators
   must select the strictly higher approved authority. Only an equal-authority tie
   remains `UNVERIFIABLE` and reaches bounded recovery.
 - The frontend decodes the `assessment_id` returned by `open_assessment`, selects
   it, and verifies that exact record before any subsequent challenge action. If
   decoding/readback fails, all lifecycle writes remain disabled.
+
+## Evidence trust boundary
+
+ReserveCovenant authenticates each approved reserve document as an exact byte
+payload from an owner-approved authority and route. It does **not** claim that a
+document is a complete representation of a Git repository, commit tree, SBOM or
+all records held by an issuer. A product making a complete-snapshot claim must
+separately verify canonical tree membership and completeness; a party-supplied
+manifest is not sufficient. The registry owner remains responsible for mapping
+an on-chain authority class to a legally authoritative publisher.
 
 ## Historical runtime evidence
 

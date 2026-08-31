@@ -1,4 +1,5 @@
 import pytest
+import hashlib
 
 AUTHORITY_RANK = {"CANONICAL": 3, "REGULATED": 2, "INDEPENDENT": 1}
 
@@ -69,3 +70,43 @@ def test_resolved_conflict_requires_complete_selected_facts():
     with pytest.raises(ValueError, match="RESOLVED_CONFLICT_INCOMPLETE"):
         if "UNKNOWN" in facts:
             raise ValueError("RESOLVED_CONFLICT_INCOMPLETE")
+
+def verify_commitment(body: bytes, digest: str, byte_length: int):
+    if len(body) != byte_length:
+        return "BYTE_LENGTH_MISMATCH"
+    actual = "sha256:" + hashlib.sha256(body).hexdigest()
+    return "VERIFIED" if actual == digest.lower() else "DIGEST_MISMATCH"
+
+def test_exact_fetched_bytes_match_digest_and_length():
+    body = b'{"asset":"DEMOUSD","reserve":"sufficient"}'
+    digest = "sha256:" + hashlib.sha256(body).hexdigest()
+    assert verify_commitment(body, digest, len(body)) == "VERIFIED"
+
+def test_changed_fetched_bytes_fail_digest_binding():
+    committed = b'{"asset":"DEMOUSD","reserve":"sufficient"}'
+    changed = b'{"asset":"DEMOUSD","reserve":"insufficient"}'
+    digest = "sha256:" + hashlib.sha256(committed).hexdigest()
+    assert verify_commitment(changed, digest, len(changed)) == "DIGEST_MISMATCH"
+
+def test_truncated_fetched_bytes_fail_length_binding():
+    body = b'{"asset":"DEMOUSD","reserve":"sufficient"}'
+    digest = "sha256:" + hashlib.sha256(body).hexdigest()
+    assert verify_commitment(body[:-1], digest, len(body)) == "BYTE_LENGTH_MISMATCH"
+
+def derive_with_integrity(integrity, reserve, scope, freshness, exception, conflict, resolution):
+    if integrity == "FAILED":
+        if (reserve, scope, freshness, exception, conflict, resolution) != (
+            "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN", "YES", "UNRESOLVED"
+        ):
+            raise ValueError("INVALID_FAILED_EVIDENCE_RESULT")
+        return "UNVERIFIABLE"
+    return derive(reserve, scope, freshness, exception, conflict, resolution)
+
+def test_digest_failure_enters_recovery_even_when_authority_ranks_differ():
+    assert derive_with_integrity(
+        "FAILED", "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN", "YES", "UNRESOLVED"
+    ) == "UNVERIFIABLE"
+
+def test_failed_integrity_cannot_carry_favorable_facts():
+    with pytest.raises(ValueError, match="INVALID_FAILED_EVIDENCE_RESULT"):
+        derive_with_integrity("FAILED", "SUFFICIENT", "MATCH", "CURRENT", "NO", "NO", "NOT_APPLICABLE")

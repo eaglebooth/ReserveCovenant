@@ -36,6 +36,11 @@ def test_assessments_require_registry_approved_authority():
         "approved_evidence_fallback_url",
         "assessment_issuer_authority",
         "assessment_challenger_authority",
+        "approved_evidence_digest",
+        "approved_evidence_byte_length",
+        "assessment_issuer_digest",
+        "assessment_counter_digest",
+        "assessment_evidence_integrity",
     ):
         assert marker in TEXT
 
@@ -55,6 +60,19 @@ def test_recovery_and_replay_guards():
     for marker in ("RECOVERY_NOT_DUE", "CAPABILITY_NOT_ACTIVE", "ASSESSMENT_MISMATCH", "WRONG_CHALLENGE_BOND"):
         assert marker in TEXT
     assert 'status not in ("RECOVERY", "CHALLENGED")' in TEXT
+
+def test_fetched_bytes_are_bound_to_owner_approved_commitment():
+    for marker in (
+        "gl.nondet.web.get",
+        "hashlib.sha256(body).hexdigest()",
+        "_DIGEST_MISMATCH",
+        "_BYTE_LENGTH_MISMATCH",
+        "INVALID_EVIDENCE_COMMITMENT",
+        "INVALID_FAILED_EVIDENCE_RESULT",
+        'integrity == "FAILED"',
+        'digest.startswith("sha256:")',
+    ):
+        assert marker in TEXT
 
 def test_state_updated_before_transfers():
     settle = TEXT.index("def settle")
