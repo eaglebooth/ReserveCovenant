@@ -4,18 +4,18 @@ ReserveCovenant is a GenLayer dApp that turns public reserve attestations into G
 
 ## Studionet deployment
 
-- Superseded digest-bound v1 contract: `0x20CE3EDE40B03625ca27c01052a8EE28829399fC`
-- Explorer: https://explorer-studio.genlayer.com/address/0x20CE3EDE40B03625ca27c01052a8EE28829399fC
+- Current deterministic-precedence contract: `0x174D129D3970d2C27B2d56BB7753A7DeA0A6cFbf`
+- Explorer: https://explorer-studio.genlayer.com/address/0x174D129D3970d2C27B2d56BB7753A7DeA0A6cFbf
 - Live app: https://reserve-covenant.vercel.app
 
 The deployed source is byte-for-byte identical to `contracts/ReserveCovenant.py`
-at Git commit `9a7d32a`: both SHA-256 values are
-`b1e4da99bdea3c29ff9d0823adab6244586c2ca518d96e8393a993d36a41ce5e`.
-Its normal digest-bound lifecycle passed, but the live conflict path exposed
-unstable model-selected precedence; see the honest record in
+at Git commit `193e54a`: both SHA-256 values are
+`a70101fec2519097b453dfbf0fe64b00d6c669a6b0296e8b1c8c590021f649a0`.
+The prior digest-bound deployment's normal lifecycle passed, but its live
+conflict path exposed unstable model-selected precedence; see the honest record in
 [`STUDIONET_DIGEST_V1_2026-08-31.md`](STUDIONET_DIGEST_V1_2026-08-31.md).
-The current source derives the authority winner deterministically and requires a
-successor deployment before resubmission. See
+The current deployment derives the authority winner deterministically. Its fresh
+release lifecycle must be recorded before resubmission. See
 [`STUDIONET_REMEDIATION_2026-08-31.md`](STUDIONET_REMEDIATION_2026-08-31.md)
 for the historical authority-precedence runtime record at the previous address.
 
