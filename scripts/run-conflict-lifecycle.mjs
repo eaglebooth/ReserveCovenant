@@ -2,10 +2,10 @@ import { createAccount, createClient } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
 import { TransactionStatus } from "genlayer-js/types";
 
-const CONTRACT = "0x22C9977940A6dB689Ed6e10F613805376eD7030e";
+const CONTRACT = "0x20CE3EDE40B03625ca27c01052a8EE28829399fC";
 const BOND = 10_000_000_000_000_000n;
-const ISSUER_COMMIT = "fb7514d1961defa92187304026b7a3fc2fb2d30d";
-const CONFLICT_COMMIT = "ef3aace45d475526bbb62bc6e63ae040c368367e";
+const ISSUER_COMMIT = "9a7d32a4dd4940f5fa60627f54bbfd96d4ef96de";
+const CONFLICT_COMMIT = "9a7d32a4dd4940f5fa60627f54bbfd96d4ef96de";
 const issuerId = "issuer-attestation.json";
 const conflictId = "challenger-conflict.json";
 const issuerPrimary = `https://raw.githubusercontent.com/eaglebooth/ReserveCovenant/${ISSUER_COMMIT}/samples/${issuerId}`;

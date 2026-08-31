@@ -4,17 +4,16 @@ ReserveCovenant is a GenLayer dApp that turns public reserve attestations into G
 
 ## Studionet deployment
 
-- Verified pre-digest contract: `0x22C9977940A6dB689Ed6e10F613805376eD7030e`
-- Explorer: https://explorer-studio.genlayer.com/address/0x22C9977940A6dB689Ed6e10F613805376eD7030e
+- Current digest-bound contract: `0x20CE3EDE40B03625ca27c01052a8EE28829399fC`
+- Explorer: https://explorer-studio.genlayer.com/address/0x20CE3EDE40B03625ca27c01052a8EE28829399fC
 - Live app: https://reserve-covenant.vercel.app
 
-That address has completed happy-path, failure-path and live authority-conflict
-verification for the authority-precedence revision. The current source adds
-fetched-byte SHA-256 and byte-length verification and therefore requires a new
-deployment before resubmission; the address above must not be presented as
-source-parity evidence for the new revision. See
+The deployed source is byte-for-byte identical to `contracts/ReserveCovenant.py`
+at Git commit `9a7d32a`: both SHA-256 values are
+`b1e4da99bdea3c29ff9d0823adab6244586c2ca518d96e8393a993d36a41ce5e`.
+Its fresh digest-bound lifecycle must be recorded before resubmission. See
 [`STUDIONET_REMEDIATION_2026-08-31.md`](STUDIONET_REMEDIATION_2026-08-31.md)
-for the historical runtime record.
+for the historical authority-precedence runtime record at the previous address.
 
 ## Why GenLayer
 
