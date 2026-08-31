@@ -97,6 +97,7 @@ transactions.push(await write(issuerClient, "assess_conflict", "assess", [assess
 assessment = await read("get_assessment", [assessmentId]);
 if (
   assessment.status !== "ASSESSED" ||
+  assessment.evidence_integrity !== "VERIFIED" ||
   assessment.conflict_resolution !== "ISSUER" ||
   assessment.issuer_authority !== "CANONICAL" ||
   assessment.challenger_authority !== "INDEPENDENT" ||

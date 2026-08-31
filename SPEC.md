@@ -37,11 +37,11 @@ OPEN after challenge deadline -> RECOVERED
 CHALLENGED -> UNVERIFIABLE -> RECOVERY after deadline -> RECOVERED
 ```
 
-When documents conflict, validators select `ISSUER` or `CHALLENGER` only when
-that side has strictly higher registry-approved authority. Final facts must be
-grounded in the selected evidence. Equal-rank conflicts produce `UNRESOLVED`;
-only this tie reaches bounded recovery. Contradictory precedence output rolls
-back without changing assessment state.
+When documents conflict, the contract deterministically selects `ISSUER` or
+`CHALLENGER` from registry authority ranks and tells validators which evidence
+must ground the final facts. The LLM cannot choose or override the winner.
+Equal-rank conflicts produce `UNRESOLVED`; incomplete selected facts fail closed
+to bounded recovery.
 
 ## Deterministic economic mapping
 

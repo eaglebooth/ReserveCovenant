@@ -4,14 +4,18 @@ ReserveCovenant is a GenLayer dApp that turns public reserve attestations into G
 
 ## Studionet deployment
 
-- Current digest-bound contract: `0x20CE3EDE40B03625ca27c01052a8EE28829399fC`
+- Superseded digest-bound v1 contract: `0x20CE3EDE40B03625ca27c01052a8EE28829399fC`
 - Explorer: https://explorer-studio.genlayer.com/address/0x20CE3EDE40B03625ca27c01052a8EE28829399fC
 - Live app: https://reserve-covenant.vercel.app
 
 The deployed source is byte-for-byte identical to `contracts/ReserveCovenant.py`
 at Git commit `9a7d32a`: both SHA-256 values are
 `b1e4da99bdea3c29ff9d0823adab6244586c2ca518d96e8393a993d36a41ce5e`.
-Its fresh digest-bound lifecycle must be recorded before resubmission. See
+Its normal digest-bound lifecycle passed, but the live conflict path exposed
+unstable model-selected precedence; see the honest record in
+[`STUDIONET_DIGEST_V1_2026-08-31.md`](STUDIONET_DIGEST_V1_2026-08-31.md).
+The current source derives the authority winner deterministically and requires a
+successor deployment before resubmission. See
 [`STUDIONET_REMEDIATION_2026-08-31.md`](STUDIONET_REMEDIATION_2026-08-31.md)
 for the historical authority-precedence runtime record at the previous address.
 
@@ -63,9 +67,10 @@ See [SPEC.md](SPEC.md) for state-machine, provenance and economic invariants.
   match the approved primary and fallback sources.
 - Validators fetch the response bytes, recompute SHA-256, verify exact byte
   length, and fail closed on mismatch or unavailability before semantic review.
-- Conflicting attestations do not automatically enter refund recovery. Validators
-  must select the strictly higher approved authority. Only an equal-authority tie
-  remains `UNVERIFIABLE` and reaches bounded recovery.
+- Conflicting attestations do not automatically enter refund recovery. The
+  contract—not the LLM—selects the strictly higher approved authority. Only an
+  equal-authority tie or incomplete selected facts remain `UNVERIFIABLE` and
+  reach bounded recovery.
 - The frontend decodes the `assessment_id` returned by `open_assessment`, selects
   it, and verifies that exact record before any subsequent challenge action. If
   decoding/readback fails, all lifecycle writes remain disabled.

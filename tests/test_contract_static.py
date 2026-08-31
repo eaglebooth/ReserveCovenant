@@ -49,10 +49,9 @@ def test_conflicts_use_deterministic_authority_precedence():
         "CANONICAL",
         "REGULATED",
         "INDEPENDENT",
-        "INVALID_AUTHORITY_PRECEDENCE",
-        'resolution == "ISSUER" and issuer_rank > challenger_rank',
-        'resolution == "CHALLENGER" and challenger_rank > issuer_rank',
-        "RESOLVED_CONFLICT_INCOMPLETE",
+        'authority_winner = "ISSUER" if issuer_rank > challenger_rank',
+        'resolution = "NOT_APPLICABLE" if conflict == "NO" else authority_winner',
+        'if resolution == "TIE"',
     ):
         assert marker in TEXT
 

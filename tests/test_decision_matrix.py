@@ -40,14 +40,13 @@ def test_unverifiable_cannot_settle():
     with pytest.raises(ValueError, match="RECOVERY_REQUIRED"):
         settle("UNVERIFIABLE",10,10)
 
-def resolve_conflict(issuer_authority, challenger_authority, resolution):
+def resolve_conflict(issuer_authority, challenger_authority, conflict):
     issuer_rank = AUTHORITY_RANK[issuer_authority]
     challenger_rank = AUTHORITY_RANK[challenger_authority]
-    return (
-        (resolution == "ISSUER" and issuer_rank > challenger_rank)
-        or (resolution == "CHALLENGER" and challenger_rank > issuer_rank)
-        or (resolution == "UNRESOLVED" and issuer_rank == challenger_rank)
-    )
+    if conflict == "NO": return "NOT_APPLICABLE"
+    if issuer_rank > challenger_rank: return "ISSUER"
+    if challenger_rank > issuer_rank: return "CHALLENGER"
+    return "UNRESOLVED"
 
 @pytest.mark.parametrize("issuer,challenger,resolution", [
     ("CANONICAL", "INDEPENDENT", "ISSUER"),
@@ -55,21 +54,13 @@ def resolve_conflict(issuer_authority, challenger_authority, resolution):
     ("REGULATED", "REGULATED", "UNRESOLVED"),
 ])
 def test_conflict_resolution_accepts_only_registry_precedence(issuer, challenger, resolution):
-    assert resolve_conflict(issuer, challenger, resolution)
+    assert resolve_conflict(issuer, challenger, "YES") == resolution
 
-@pytest.mark.parametrize("issuer,challenger,resolution", [
-    ("INDEPENDENT", "CANONICAL", "ISSUER"),
-    ("REGULATED", "INDEPENDENT", "CHALLENGER"),
-    ("CANONICAL", "INDEPENDENT", "UNRESOLVED"),
-])
-def test_conflict_resolution_rejects_lower_authority_or_avoidable_refund(issuer, challenger, resolution):
-    assert not resolve_conflict(issuer, challenger, resolution)
+def test_no_conflict_is_not_applicable_regardless_of_rank():
+    assert resolve_conflict("CANONICAL", "INDEPENDENT", "NO") == "NOT_APPLICABLE"
 
-def test_resolved_conflict_requires_complete_selected_facts():
-    facts = ("UNKNOWN", "MATCH", "CURRENT", "NO")
-    with pytest.raises(ValueError, match="RESOLVED_CONFLICT_INCOMPLETE"):
-        if "UNKNOWN" in facts:
-            raise ValueError("RESOLVED_CONFLICT_INCOMPLETE")
+def test_incomplete_selected_facts_fail_closed_to_unverifiable():
+    assert derive("UNKNOWN", "MATCH", "CURRENT", "NO", "YES", "ISSUER") == "UNVERIFIABLE"
 
 def verify_commitment(body: bytes, digest: str, byte_length: int):
     if len(body) != byte_length:
