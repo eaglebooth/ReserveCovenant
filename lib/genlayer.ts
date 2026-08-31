@@ -16,6 +16,7 @@ type RuntimeClient = {
   getTransaction:(args:{hash:`0x${string}`})=>Promise<Record<string,unknown>>;
 };
 export type Result={success:boolean;data?:unknown;hash?:string;status?:string;error?:string};
+export type WriteResult=Result&{transaction?:Record<string,unknown>;receipt?:Record<string,unknown>};
 type RuntimeFailure={kind:string;payload:string};
 function findRuntimeFailure(value:unknown,seen=new Set<unknown>()):RuntimeFailure|null{
   if(!value||typeof value!=="object"||seen.has(value))return null;
@@ -48,7 +49,7 @@ export async function readContract(functionName:string,args:unknown[]=[]):Promis
   try{return{success:true,data:await(readClient as unknown as RuntimeClient).readContract({address:contractAddress(),functionName,args})};}
   catch(error){return{success:false,error:error instanceof Error?error.message:"Contract read failed."};}
 }
-export async function writeContract(functionName:string,args:unknown[]=[],value=BigInt(0)):Promise<Result>{
+export async function writeContract(functionName:string,args:unknown[]=[],value=BigInt(0)):Promise<WriteResult>{
   if(!window.ethereum)return{success:false,error:"Connect a wallet before writing."};
   if(!contractAddress()||contractAddress().endsWith("0000000000000000000000000000000000000000"))return{success:false,error:"Deploy and configure the contract first."};
   let hash="";
@@ -62,7 +63,7 @@ export async function writeContract(functionName:string,args:unknown[]=[],value=
     let observed=receipt;try{observed=await client.getTransaction({hash:hash as `0x${string}`});}catch{}
     const failure=findRuntimeFailure(observed)||findRuntimeFailure(receipt);
     if(failure)return{success:false,hash,error:`Contract rejected this action: ${failure.payload}`};
-    return{success:true,hash,status:String(observed.statusName||receipt.statusName||"ACCEPTED"),data:receipt};
+    return{success:true,hash,status:String(observed.statusName||receipt.statusName||"ACCEPTED"),data:receipt,transaction:observed,receipt};
   }catch(error){return{success:false,hash,error:error instanceof Error?error.message:"Contract write failed."};}
 }
 export function unwrap<T>(value:unknown):T|null{try{if(typeof value==="string")return JSON.parse(value) as T;if(value&&typeof value==="object"&&"result" in value)return unwrap<T>((value as {result:unknown}).result);return value as T;}catch{return null;}}

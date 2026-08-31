@@ -22,6 +22,34 @@ def test_semantic_consensus_is_substantive():
     assert "reserve_coverage" in TEXT
     assert "material_exception" in TEXT
     assert "sources_conflict" in TEXT
+    assert "conflict_resolution" in TEXT
+
+def test_assessments_require_registry_approved_authority():
+    for marker in (
+        "approve_issuer",
+        "approve_evidence",
+        "ISSUER_NOT_APPROVED",
+        "EVIDENCE_NOT_APPROVED",
+        "EVIDENCE_EPOCH_MISMATCH",
+        "EVIDENCE_SOURCE_MISMATCH",
+        "approved_evidence_primary_url",
+        "approved_evidence_fallback_url",
+        "assessment_issuer_authority",
+        "assessment_challenger_authority",
+    ):
+        assert marker in TEXT
+
+def test_conflicts_use_deterministic_authority_precedence():
+    for marker in (
+        "CANONICAL",
+        "REGULATED",
+        "INDEPENDENT",
+        "INVALID_AUTHORITY_PRECEDENCE",
+        'resolution == "ISSUER" and issuer_rank > challenger_rank',
+        'resolution == "CHALLENGER" and challenger_rank > issuer_rank',
+        "RESOLVED_CONFLICT_INCOMPLETE",
+    ):
+        assert marker in TEXT
 
 def test_recovery_and_replay_guards():
     for marker in ("RECOVERY_NOT_DUE", "CAPABILITY_NOT_ACTIVE", "ASSESSMENT_MISMATCH", "WRONG_CHALLENGE_BOND"):
