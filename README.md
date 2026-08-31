@@ -6,6 +6,7 @@ ReserveCovenant is a GenLayer dApp that turns public reserve attestations into G
 
 - Current deterministic-precedence contract: `0x174D129D3970d2C27B2d56BB7753A7DeA0A6cFbf`
 - Explorer: https://explorer-studio.genlayer.com/address/0x174D129D3970d2C27B2d56BB7753A7DeA0A6cFbf
+- Final Studionet happy/failure/conflict evidence: [`STUDIONET_FINAL_2026-08-31.md`](STUDIONET_FINAL_2026-08-31.md)
 - Live app: https://reserve-covenant.vercel.app
 
 The deployed source is byte-for-byte identical to `contracts/ReserveCovenant.py`
